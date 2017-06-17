@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Email</title>
+</head>
+<body>
+
+  <table style="font-family: Sans-Serif; border: none; cell-padding:0;">
+    <tbody>
+      {% for group in groups %}
+        <tr><td  style="background-color: #dddddd; text-align: center;">
+          <h2>{{group.title}}</h2>
+        </td></tr>
+        <tr><td>
+          <table>
+            {% for el in group.items %}
+              <tr>{{el | safe}}</tr>
+            {% endfor %}
+          </table>
+        </td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
