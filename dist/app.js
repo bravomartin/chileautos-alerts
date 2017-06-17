@@ -55,18 +55,19 @@ function sendEmail(email, toEmail, exit){
 
 let cache = redis.createClient(process.env.REDIS_URL);
 let reqs = [];
-let globals = {};
+let toEmail;
 
 if(process.env.REDIS_FLUSH) cache.flushdb();
 
 req(process.env.SOURCE_PATH).then((content)=>{
   let parsed = jsYaml.safeLoad(content);
-  globals.toEmail = parsed.email;
+  toEmail = parsed.email;
   return parsed.busquedas
 }).then((busquedas)=>{
-  busquedas.forEach((el,i)=>{
-    globals.name = el.name;
-    let r = req(el.url, reqOptions).then((body)=>{
+  console.log(busquedas);
+  busquedas.forEach((b,i)=>{
+    let name = b.nombre;
+    let r = req(b.url, reqOptions).then((body)=>{
       return cheerio.load(body)
     }).then(($)=>{
       let $ads = $(".listing_thumbs .ad"),
@@ -81,13 +82,13 @@ req(process.env.SOURCE_PATH).then((content)=>{
         };
         ads.push(ad);
       });
-      console.log(ads.length, "ads found for", globals.name);
+      console.log(ads.length, "ads found for", name);
       return ads
     }).then((ads)=>{
       return cache.mget(ads.map(a=>a.id))
       .then(function (caches) {
         let group = {};
-        group.title = globals.name;
+        group.title = name;
         group.items = [];
         ads.forEach((ad,i)=>{
           if (caches[i]){
@@ -105,7 +106,7 @@ req(process.env.SOURCE_PATH).then((content)=>{
       })
     }).then((group)=>{
       if (group.items.length < 1){ 
-        console.log('nothing new for ', globals.name);
+        console.log('nothing new for ', name);
         return null
       }
       else return group
@@ -117,9 +118,10 @@ req(process.env.SOURCE_PATH).then((content)=>{
 
   Promise.all(reqs).then((groups)=>{
     console.log('all done');
+    console.log('to: ', toEmail);
     groups = _.compact(groups);
     if (groups.length > 0) {
-      sendEmail(makeEmail(groups), globals.toEmail, true);
+      sendEmail(makeEmail(groups), toEmail, true);
     } else {
       console.log('nothing new at all');
       process.exit(0);
