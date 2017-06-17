@@ -4,18 +4,20 @@ import nunjucks from 'nunjucks'
 nunjucks.configure('.', { autoescape: true });
 let mailgun = Mailgun({apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN});
 
-let toEmail = process.env.TO_EMAIL
+//REQ
+export let reqOptions = { headers: {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}}
 
-export function makeEmail(groups){
-  return nunjucks.render('template.tmpl', {groups: groups})
-}
-
+//MONEY
 export function parseMoney(str){
   return Number(str.replace(/[^0-9\,]+/g,""));
 }
 
-export function sendEmail(email, exit){
-  
+// EMAIL
+export function makeEmail(groups){
+  return nunjucks.render('template.tmpl', {groups: groups})
+}
+
+export function sendEmail(email, toEmail, exit){
   let mail = mailcomposer({
     from: 'Yapo Alerts <alerts@sandboxdebf46a0d2c34fe390501cdd02ee004d.mailgun.org>',
     to: toEmail,
