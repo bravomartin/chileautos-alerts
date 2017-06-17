@@ -5,18 +5,17 @@ import {safeLoad} from 'js-yaml'
 import cheerio from 'cheerio'
 import req from 'request-promise-native'
 
-import {addToEmail,sendEmail, makeEmail} from './functions'
+import {sendEmail, makeEmail} from './functions'
 import redis from 'then-redis'
 
 let cache = redis.createClient(process.env.REDIS_URL);
 
-
+if(process.env.REDIS_FLUSH) cache.flushdb()
 
 let reqOptions = { headers: {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}}
 
 let busquedasFile = fs.readFileSync('busquedas.yml', {encoding: 'utf8'})
 let busquedas = safeLoad(busquedasFile)
-
 
 let reqs = []
 let updates = 0
@@ -51,7 +50,6 @@ Object.keys(busquedas).forEach((name,i)=>{
           // console.log(ad.id, "exists for", name)
           // console.log(`price from ${cached.price} to ${ad.price}`)
           // console.log(cached.price == ad.price ? "same price" : "different price")
-          cache.del(ad.id)
         } else {
           // console.log(ad.id, "is new for", name)
           group.items.push(ad.html)
