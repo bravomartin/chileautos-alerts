@@ -6,10 +6,10 @@ var _ = _interopDefault(require('lodash'));
 var jsYaml = require('js-yaml');
 var cheerio = _interopDefault(require('cheerio'));
 var req = _interopDefault(require('request-promise-native'));
+var redis = _interopDefault(require('then-redis'));
 var mailcomposer = _interopDefault(require('mailcomposer'));
 var Mailgun = _interopDefault(require('mailgun-js'));
 var nunjucks = _interopDefault(require('nunjucks'));
-var redis = _interopDefault(require('then-redis'));
 
 nunjucks.configure('.', { autoescape: true });
 let mailgun = Mailgun({apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN});
@@ -36,7 +36,6 @@ function sendEmail(email, toEmail, exit){
   });
 
   mail.build( function(mailBuildError, message){
-    console.log(`sending email to ${toEmail}`);
     let dataToSend = {
       to: toEmail,
       message: message.toString('ascii')
@@ -46,7 +45,7 @@ function sendEmail(email, toEmail, exit){
         console.error(sendError);
         if(exit) process.exit(1);
       } else {
-        console.log("Success!");
+        console.log("Email sent!");
         if(exit) process.exit(0);
       }
     });
@@ -54,21 +53,21 @@ function sendEmail(email, toEmail, exit){
 }
 
 let cache = redis.createClient(process.env.REDIS_URL);
+if(process.env.REDIS_FLUSH) cache.flushdb();
+
 let reqs = [];
 let toEmail;
-
-if(process.env.REDIS_FLUSH) cache.flushdb();
 
 req(process.env.SOURCE_PATH).then((content)=>{
   let parsed = jsYaml.safeLoad(content);
   toEmail = parsed.email;
   return parsed.busquedas
 }).then((busquedas)=>{
-  console.log(busquedas);
   busquedas.forEach((b,i)=>{
     let name = b.nombre;
     let r = req(b.url, reqOptions).then((body)=>{
-      return cheerio.load(body)
+    
+    return cheerio.load(body)
     }).then(($)=>{
       let $ads = $(".listing_thumbs .ad"),
           ads = [];
@@ -82,7 +81,6 @@ req(process.env.SOURCE_PATH).then((content)=>{
         };
         ads.push(ad);
       });
-      console.log(ads.length, "ads found for", name);
       return ads
     }).then((ads)=>{
       return cache.mget(ads.map(a=>a.id))
@@ -106,7 +104,7 @@ req(process.env.SOURCE_PATH).then((content)=>{
       })
     }).then((group)=>{
       if (group.items.length < 1){ 
-        console.log('nothing new for ', name);
+        console.log('nada nuevo para ', name);
         return null
       }
       else return group
@@ -117,13 +115,12 @@ req(process.env.SOURCE_PATH).then((content)=>{
   });
 
   Promise.all(reqs).then((groups)=>{
-    console.log('all done');
-    console.log('to: ', toEmail);
     groups = _.compact(groups);
     if (groups.length > 0) {
+      console.log(`enviando notificaciones a ${toEmail}`);
       sendEmail(makeEmail(groups), toEmail, true);
     } else {
-      console.log('nothing new at all');
+      console.log('nada que reportar');
       process.exit(0);
     }
   });

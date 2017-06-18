@@ -28,7 +28,6 @@ export function sendEmail(email, toEmail, exit){
   })
 
   mail.build( function(mailBuildError, message){
-    console.log(`sending email to ${toEmail}`)
     let dataToSend = {
       to: toEmail,
       message: message.toString('ascii')
@@ -38,7 +37,7 @@ export function sendEmail(email, toEmail, exit){
         console.error(sendError);
         if(exit) process.exit(1)
       } else {
-        console.log("Success!")
+        console.log("Email sent!")
         if(exit) process.exit(0)
       }
     })

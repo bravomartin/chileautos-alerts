@@ -3,25 +3,25 @@ import {safeLoad} from 'js-yaml'
 import cheerio from 'cheerio'
 import req from 'request-promise-native'
 
-import {sendEmail, makeEmail, reqOptions, parseMoney} from './functions'
 import redis from 'then-redis'
-
 let cache = redis.createClient(process.env.REDIS_URL);
+if(process.env.REDIS_FLUSH) cache.flushdb()
+
+import {sendEmail, makeEmail, reqOptions, parseMoney} from './functions'
+
 let reqs = []
 let toEmail
-
-if(process.env.REDIS_FLUSH) cache.flushdb()
 
 req(process.env.SOURCE_PATH).then((content)=>{
   let parsed = safeLoad(content)
   toEmail = parsed.email
   return parsed.busquedas
 }).then((busquedas)=>{
-  console.log(busquedas)
   busquedas.forEach((b,i)=>{
     let name = b.nombre
     let r = req(b.url, reqOptions).then((body)=>{
-      return cheerio.load(body)
+    
+    return cheerio.load(body)
     }).then(($)=>{
       let $ads = $(".listing_thumbs .ad"),
           ads = []
@@ -35,7 +35,6 @@ req(process.env.SOURCE_PATH).then((content)=>{
         }
         ads.push(ad)
       })
-      console.log(ads.length, "ads found for", name)
       return ads
     }).then((ads)=>{
       return cache.mget(ads.map(a=>a.id))
@@ -59,7 +58,7 @@ req(process.env.SOURCE_PATH).then((content)=>{
       })
     }).then((group)=>{
       if (group.items.length < 1){ 
-        console.log('nothing new for ', name)
+        console.log('nada nuevo para ', name)
         return null
       }
       else return group
@@ -70,13 +69,12 @@ req(process.env.SOURCE_PATH).then((content)=>{
   })
 
   Promise.all(reqs).then((groups)=>{
-    console.log('all done')
-    console.log('to: ', toEmail)
     groups = _.compact(groups)
     if (groups.length > 0) {
+      console.log(`enviando notificaciones a ${toEmail}`)
       sendEmail(makeEmail(groups), toEmail, true)
     } else {
-      console.log('nothing new at all')
+      console.log('nada que reportar')
       process.exit(0)
     }
   })
