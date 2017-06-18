@@ -5,7 +5,10 @@ nunjucks.configure('.', { autoescape: true });
 let mailgun = Mailgun({apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN});
 
 //REQ
-export let reqOptions = { headers: {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}}
+export let reqOptions = { headers: {
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+  'Cache-Control': 'no-cache'
+}}
 
 //MONEY
 export function parseMoney(str){
