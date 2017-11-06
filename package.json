@@ -1,7 +1,7 @@
 {
-  "name": "yapo-alerts",
+  "name": "chileautos-alerts",
   "version": "1.0.0",
-  "description": "Tracker de avisos nuevos en yapo",
+  "description": "Tracker de avisos nuevos en chileautos",
   "main": "app.js",
   "scripts": {
     "dev": "node -r babel-register -r dotenv/config app.js",
