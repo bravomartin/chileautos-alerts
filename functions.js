@@ -38,7 +38,7 @@ export function sendEmail(email, toEmail, exit) {
     encoding: 'utf-8'
   });
   if (process.env.FAKE) {
-    fs.writeFileSync('email.hmtl', email, { encoding: 'utf-8' });
+    fs.writeFileSync('email.html', email, { encoding: 'utf-8' });
     if (exit) process.exit(0);
   }
   mail.build(function(mailBuildError, message) {
