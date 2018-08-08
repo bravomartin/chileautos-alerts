@@ -48,7 +48,7 @@ req(process.env.SOURCE_PATH)
 
             let ad = {
               id: url.split('/').pop(),
-              url: url,
+              url: 'https://chileautos.cl' + url,
               html: $el.html(),
               title: $el.find('.listing-item__title').text(),
               price: $el.find('.listing-item__price p').text(),

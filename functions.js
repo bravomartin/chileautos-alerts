@@ -30,7 +30,7 @@ export function makeEmail(groups) {
 export function sendEmail(email, toEmail, exit) {
   let mail = mailcomposer({
     from:
-      'Yapo Alerts <alerts@sandboxdebf46a0d2c34fe390501cdd02ee004d.mailgun.org>',
+      'Chileautos Alerts <alerts@sandboxdebf46a0d2c34fe390501cdd02ee004d.mailgun.org>',
     to: toEmail,
     subject: 'Hay nuevas publicaciones en tus busquedas!',
     body: 'Abrelo...',

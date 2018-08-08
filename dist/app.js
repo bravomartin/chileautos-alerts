@@ -38,7 +38,7 @@ function makeEmail(groups) {
 function sendEmail(email, toEmail, exit) {
   let mail = mailcomposer({
     from:
-      'Yapo Alerts <alerts@sandboxdebf46a0d2c34fe390501cdd02ee004d.mailgun.org>',
+      'Chileautos Alerts <alerts@sandboxdebf46a0d2c34fe390501cdd02ee004d.mailgun.org>',
     to: toEmail,
     subject: 'Hay nuevas publicaciones en tus busquedas!',
     body: 'Abrelo...',
@@ -108,7 +108,7 @@ req(process.env.SOURCE_PATH)
 
             let ad = {
               id: url.split('/').pop(),
-              url: url,
+              url: 'https://chileautos.cl' + url,
               html: $el.html(),
               title: $el.find('.listing-item__title').text(),
               price: $el.find('.listing-item__price p').text(),
