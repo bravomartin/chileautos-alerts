@@ -9,6 +9,7 @@ if (process.env.REDIS_FLUSH) cache.flushdb();
 
 import { sendEmail, makeEmail, reqOptions, parseMoney } from './functions';
 
+const HOST = 'https://chileautos.cl';
 let reqs = [];
 let toEmail;
 
@@ -33,22 +34,24 @@ req(process.env.SOURCE_PATH)
             ads = [];
           $ads.each((i, el) => {
             const $el = $(el);
-
+            const url = HOST + $el.find('.listing-item__header a').attr('href');
             let imgurl = $el.find('.carousel-inner .item.active').attr('style');
+
             if (imgurl) {
               imgurl = imgurl.match(/url\((.+)\)/)[1];
               imgurl = imgurl.replace(/\\0000/g, '%');
               imgurl = decodeURIComponent(imgurl);
             }
+            // Add image
             $el
               .find('.listing-item__carousel')
               .html(`<img src="${imgurl}" width="300"/>`);
-
-            const url = $el.find('.listing-item__header a').attr('href');
+            // Fix title link
+            $el.find('listing-item__header a').attr('href', url);
 
             let ad = {
               id: url.split('/').pop(),
-              url: 'https://chileautos.cl' + url,
+              url: url,
               html: $el.html(),
               title: $el.find('.listing-item__title').text(),
               price: $el.find('.listing-item__price p').text(),
