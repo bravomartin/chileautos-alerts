@@ -4,7 +4,6 @@ const { sendEmail, composeEmail, getStore, saveState, getResults } = require('./
 
 const app = async () => {
 	const store = await getStore();
-	console.log(store);
 	const email = [];
 	const promises = store.config.searches.map(async b => {
 		console.log('Searching for new:', b.name);
@@ -14,7 +13,7 @@ const app = async () => {
 		} catch (e) {
 			throw new Error('error getting results');
 		}
-		console.log(results);
+
 		const newResults = [];
 		results.forEach(result => {
 			const existing = store.state[b.name] && store.state[b.name].find(r => r.id == result.id);
