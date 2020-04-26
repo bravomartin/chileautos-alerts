@@ -32,4 +32,9 @@ const app = async () => {
 	saveState(store.state);
 };
 
-app();
+try {
+	app();
+} catch (e) {
+	console.log(e);
+} finally {
+}
