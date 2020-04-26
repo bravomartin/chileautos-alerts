@@ -10,10 +10,8 @@ const app = async () => {
 		const results = await getResults(b.url);
 		const newResults = [];
 		results.forEach(result => {
-			return newResults.push(result);
 			const existing = store.state[b.name] && store.state[b.name].find(r => r.id == result.id);
 			if (!existing) return newResults.push(result);
-
 			if (existing.price != result.price) {
 				result.oldPrice = existing.priceDisplay || existing.price;
 				newResults.push(result);
@@ -23,6 +21,9 @@ const app = async () => {
 			const newGroup = { name: b.name, items: newResults };
 			if (b.email) sendEmail([newGroup], b.email);
 			email.push(newGroup);
+			console.log('Found %s new results', newResults.length);
+		} else {
+			console.log('No new results found');
 		}
 		store.state[b.name] = results;
 	});

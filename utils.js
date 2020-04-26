@@ -105,6 +105,7 @@ function composeEmail(groups) {
 }
 
 function sendEmail(data, toEmail) {
+	console.log('Sending email...');
 	const email = nunjucks.render('template.tmpl', { data });
 	let mail = mailcomposer({
 		from: 'Chileautos Alerts <alerts@sandboxdebf46a0d2c34fe390501cdd02ee004d.mailgun.org>',
@@ -116,6 +117,7 @@ function sendEmail(data, toEmail) {
 	});
 	if (process.env.MOCK == 'true') {
 		fs.writeFileSync('data/email.html', email, { encoding: 'utf-8' });
+		console.log('saved to data/email.html');
 	} else {
 		mail.build(function(mailBuildError, message) {
 			let dataToSend = {
