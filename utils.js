@@ -10,7 +10,7 @@ const nunjucks = require('nunjucks');
 // config
 
 const octokit = new Octokit({
-	auth: process.env.GITHUB_TOKEN
+	auth: process.env.TOKEN_GITHUB
 });
 
 nunjucks.configure('.', { autoescape: true });

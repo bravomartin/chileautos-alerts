@@ -25,5 +25,6 @@ jobs:
         env:
             CI: true
             GIST_ID: 'fbd1743e56040c69bb06b8846fa731d0'
+            TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
             MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
             MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
