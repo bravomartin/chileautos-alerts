@@ -12,7 +12,7 @@ const app = async () => {
 		try {
 			results = await getResults(b.url);
 		} catch (e) {
-			console.log('error getting results');
+			throw new Error('error getting results');
 		}
 		console.log(results);
 		const newResults = [];
@@ -42,6 +42,5 @@ const app = async () => {
 try {
 	app();
 } catch (e) {
-	console.log(e);
-} finally {
+	throw new Error('General Error', e);
 }

@@ -177,7 +177,8 @@ const saveState = async state => {
 				}
 			});
 		} catch (e) {
-			console.log('error saving gist', e);
+			console.log('error saving gist');
+			throw e;
 		} finally {
 		}
 	}
