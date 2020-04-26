@@ -14,7 +14,7 @@ const app = async () => {
 		} catch (e) {
 			console.log('error getting results');
 		}
-
+		console.log(results);
 		const newResults = [];
 		results.forEach(result => {
 			const existing = store.state[b.name] && store.state[b.name].find(r => r.id == result.id);

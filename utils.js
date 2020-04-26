@@ -126,7 +126,7 @@ function sendEmail(data, toEmail) {
 			};
 			mailgun.messages().sendMime(dataToSend, (sendError, body) => {
 				if (sendError) {
-					throw new Error(sendError);
+					console.log('error sending email', sendError);
 				} else {
 					console.log('Email sent!');
 				}
