@@ -9,14 +9,35 @@
 
   <table style="font-family: Sans-Serif; border: none; cell-padding:0;">
     <tbody>
-      {% for group in groups %}
+      {% for group in data %}
         <tr><td  style="background-color: #dddddd; text-align: center;">
-          <h2>{{group.title}}</h2>
+          <h2>{{group.name}}</h2>
         </td></tr>
         <tr><td>
           <table>
-            {% for el in group.items %}
-              <tr>{{el | safe}}</tr>
+            {% for item in group.items %}
+              <tr>
+                <td>
+                  <h3><a href="{{item.url}}">{{item.name}}</a></h3>
+                    <table>
+                      <tr>
+                        <td>
+                          <img src="{{item.img}}" style="width:200px;"/>
+                        </td>
+                        <td style="vertical-align:top; padding-left: 20px">
+                           <div>
+                             <strong>{{item.priceDisplay}}</strong>
+                             {% if item.oldPrice %}<span>(was {{item.oldPrice}})</span>{% endif %}
+                           </div>
+
+                           {% for detail in item.details %}
+                           <div>{{detail.name}}: {{detail.value}}</div>
+                           {% endfor %}
+                        </td>
+                      </tr>
+                    </table>
+                </td>
+              </tr>
             {% endfor %}
           </table>
         </td></tr>

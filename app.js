@@ -1,108 +1,34 @@
-import _ from 'lodash';
-import { safeLoad } from 'js-yaml';
-import cheerio from 'cheerio';
-import req from 'request-promise-native';
+const _ = require('lodash');
 
-import redis from 'then-redis';
-let cache = redis.createClient(process.env.REDIS_URL);
-if (process.env.REDIS_FLUSH) cache.flushdb();
+const { sendEmail, composeEmail, getStore, saveState, getResults } = require('./utils');
 
-import { sendEmail, makeEmail, reqOptions, parseMoney } from './functions';
+const app = async () => {
+	const store = await getStore();
+	const email = [];
+	const promises = store.config.searches.map(async b => {
+		console.log('Searching for new:', b.name);
+		const results = await getResults(b.url);
+		const newResults = [];
+		results.forEach(result => {
+			return newResults.push(result);
+			const existing = store.state[b.name] && store.state[b.name].find(r => r.id == result.id);
+			if (!existing) return newResults.push(result);
 
-const HOST = 'https://chileautos.cl';
-let reqs = [];
-let toEmail;
+			if (existing.price != result.price) {
+				result.oldPrice = existing.priceDisplay || existing.price;
+				newResults.push(result);
+			}
+		});
+		if (newResults.length) {
+			const newGroup = { name: b.name, items: newResults };
+			if (b.email) sendEmail([newGroup], b.email);
+			email.push(newGroup);
+		}
+		store.state[b.name] = results;
+	});
+	await Promise.all(promises);
+	if (email.length) sendEmail(email, store.config.email);
+	saveState(store.state);
+};
 
-req(process.env.SOURCE_PATH)
-  .then(content => {
-    let parsed = safeLoad(content);
-    toEmail = parsed.email;
-    return parsed.busquedas;
-  })
-  .then(busquedas => {
-    busquedas.forEach((b, i) => {
-      let name = b.nombre;
-      let r = req(b.url, reqOptions)
-        .then(body => {
-          return cheerio.load(body);
-        })
-        .then($ => {
-          return $;
-        })
-        .then($ => {
-          let $ads = $('.search-listings__items .listing-item'),
-            ads = [];
-          $ads.each((i, el) => {
-            const $el = $(el);
-            const url = HOST + $el.find('.listing-item__header a').attr('href');
-            let imgurl = $el.find('.carousel-inner .item.active').attr('style');
-
-            if (imgurl) {
-              imgurl = imgurl.match(/url\((.+)\)/)[1];
-              imgurl = imgurl.replace(/\\0000/g, '%');
-              imgurl = decodeURIComponent(imgurl);
-            }
-            // Add image
-            $el
-              .find('.listing-item__carousel')
-              .html(`<img src="${imgurl}" width="300"/>`);
-            // Fix title link
-            $el.find('listing-item__header a').attr('href', url);
-
-            let ad = {
-              id: url.split('/').pop(),
-              url: url,
-              html: $el.html(),
-              title: $el.find('.listing-item__title').text(),
-              price: $el.find('.listing-item__price p').text(),
-              imgurl: imgurl
-            };
-            ads.push(ad);
-          });
-          // return [];
-          return ads;
-        })
-        .then(ads => {
-          if (ads.length == 0) return { items: [] };
-          return cache.mget(ads.map(a => a.id)).then(function(caches) {
-            let group = {};
-            group.title = name;
-            group.items = [];
-            ads.forEach((ad, i) => {
-              if (caches[i]) {
-                let cached = JSON.parse(caches[i]);
-              } else {
-                group.items.push(ad.html);
-                cache.set(ad.id, JSON.stringify(ad));
-              }
-            });
-            return group;
-          });
-        })
-        .then(group => {
-          if (group.items.length < 1) {
-            console.log('nada nuevo para ', name);
-            return null;
-          } else {
-            console.log('%s nuevos para %s', group.items.length, name);
-            return group;
-          }
-        })
-        .catch(e => {
-          console.log(e);
-        });
-      reqs.push(r);
-    });
-
-    Promise.all(reqs).then(groups => {
-      groups = _.compact(groups);
-      if (groups.length > 0) {
-        console.log(`enviando notificaciones a ${toEmail}`);
-        const email = makeEmail(groups);
-        sendEmail(email, toEmail, true);
-      } else {
-        console.log('nada que reportar');
-        process.exit(0);
-      }
-    });
-  });
+app();
