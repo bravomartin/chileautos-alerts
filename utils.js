@@ -167,14 +167,19 @@ const saveState = async state => {
 	if (process.env.NODE_ENV == 'development') {
 		fs.writeFileSync('./data/state.json', content, 'utf8');
 	} else {
-		const gist = await octokit.gists.update({
-			gist_id: process.env.GIST_ID,
-			files: {
-				'state.json': {
-					content
+		try {
+			await octokit.gists.update({
+				gist_id: process.env.GIST_ID,
+				files: {
+					'state.json': {
+						content
+					}
 				}
-			}
-		});
+			});
+		} catch (e) {
+			console.log('error saving gist', e);
+		} finally {
+		}
 	}
 };
 

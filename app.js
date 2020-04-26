@@ -4,6 +4,7 @@ const { sendEmail, composeEmail, getStore, saveState, getResults } = require('./
 
 const app = async () => {
 	const store = await getStore();
+	console.log(store);
 	const email = [];
 	const promises = store.config.searches.map(async b => {
 		console.log('Searching for new:', b.name);

@@ -20,10 +20,8 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
-            - run: |
-                  sudo apt install curl
-                  npm install
-                  npm start
+            - run: npm install
+            - run: npm start
         env:
             CI: true
             GIST_ID: 'fbd1743e56040c69bb06b8846fa731d0'
