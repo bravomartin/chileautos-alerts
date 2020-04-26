@@ -20,10 +20,12 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
-            - run: npm install
-            - run: npm start
-              env:
-                  CI: true
-                  GIST_ID: 'fbd1743e56040c69bb06b8846fa731d0'
-                  MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
-                  MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}
+            - run: |
+                  sudo apt install curl
+                  npm install
+                  npm start
+        env:
+            CI: true
+            GIST_ID: 'fbd1743e56040c69bb06b8846fa731d0'
+            MAILGUN_API_KEY: ${{ secrets.MAILGUN_API_KEY }}
+            MAILGUN_DOMAIN: ${{ secrets.MAILGUN_DOMAIN }}

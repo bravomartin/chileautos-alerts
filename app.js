@@ -7,7 +7,13 @@ const app = async () => {
 	const email = [];
 	const promises = store.config.searches.map(async b => {
 		console.log('Searching for new:', b.name);
-		const results = await getResults(b.url);
+		let results;
+		try {
+			results = await getResults(b.url);
+		} catch (e) {
+			console.log('error getting results');
+		}
+
 		const newResults = [];
 		results.forEach(result => {
 			const existing = store.state[b.name] && store.state[b.name].find(r => r.id == result.id);
