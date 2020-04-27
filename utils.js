@@ -163,7 +163,7 @@ const getStore = async () => {
 };
 
 const saveState = async state => {
-	const content = JSON.stringify(state, null, 2);
+	const content = JSON.stringify(state);
 	if (process.env.NODE_ENV == 'development') {
 		fs.writeFileSync('./data/state.json', content, 'utf8');
 	} else {
