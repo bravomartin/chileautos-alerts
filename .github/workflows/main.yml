@@ -1,6 +1,6 @@
 # This workflow will do a clean install of node dependencies and run `npm start` every morning
 
-name: Node.js CI
+name: Run Search
 
 on:
     schedule:
