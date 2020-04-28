@@ -110,7 +110,7 @@ function sendEmail(data, toEmail) {
 	let mail = mailcomposer({
 		from: 'Chileautos Alerts <alerts@sandboxdebf46a0d2c34fe390501cdd02ee004d.mailgun.org>',
 		to: toEmail,
-		subject: 'Hay nuevas publicaciones en tus busquedas!',
+		subject: 'Hay nuevos autos en tus busquedas!',
 		body: 'Abrelo...',
 		html: email,
 		encoding: 'utf-8'
