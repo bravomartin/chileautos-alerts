@@ -64,34 +64,43 @@ const curl = url => {
 };
 
 const getResults = async (url, results = []) => {
-	const res = await curl(url);
-	const { document } = new JSDOM(res).window;
-	const items = document.querySelectorAll('.listing-item');
-	for (i in items) {
-		const item = items[i];
-		if (item.querySelector) {
-			const result = {
-				id: item.id,
-				name: item.querySelector('h3').textContent,
-				url: host + item.querySelector('h3 a').getAttribute('href'),
-				price: parseMoney(item.querySelector('.price a').textContent),
-				priceDisplay: item.querySelector('.price a').textContent.replace(/CLP\s*/g, ''),
-				img: item.querySelector('.carousel-item img').getAttribute('src')
-			};
-			result.details = [];
-			item.querySelectorAll('.key-detail').forEach(detail => {
-				result.details.push({
-					name: detail.querySelector('.key-detail-type').textContent,
-					value: detail.querySelector('.key-detail-value').textContent
-				});
-			});
-			results.push(result);
+	try {
+		const res = await curl(url);
+
+		const { document } = new JSDOM(res).window;
+		const items = document.querySelectorAll('.listing-item');
+		for (i in items) {
+			const item = items[i];
+			if (item.querySelector) {
+				const result = {
+					id: item.id,
+					name: item.querySelector('h3').textContent,
+					url: host + item.querySelector('h3 a').getAttribute('href'),
+					price: parseMoney(item.querySelector('.price a').textContent),
+					priceDisplay: item.querySelector('.price a').textContent.replace(/CLP\s*/g, ''),
+					img: item.querySelector('.carousel-item img').getAttribute('src')
+				};
+
+				result.details = [];
+				item.querySelectorAll('.key-detail') &&
+					item.querySelectorAll('.key-detail').forEach(detail => {
+						result.details.push({
+							name: detail.querySelector('.key-detail-type').textContent,
+							value: detail.querySelector('.key-detail-value').textContent
+						});
+					});
+				results.push(result);
+			}
+			i++;
 		}
-		i++;
+		const next = document.querySelector('.page-link.next')
+			? document.querySelector('.page-link.next').getAttribute('href')
+			: false;
+		if (next) return await getResults(host + next, results);
+		return results;
+	} catch (e) {
+		console.log(e);
 	}
-	const next = document.querySelector('.page-link.next').getAttribute('href');
-	if (next) return await getResults(host + next, results);
-	return results;
 };
 
 //MONEY
