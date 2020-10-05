@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const { JSDOM } = require('jsdom');
 const { spawn } = require('child_process');
 const { safeLoad } = require('js-yaml');
@@ -13,7 +14,7 @@ const octokit = new Octokit({
 	auth: process.env.TOKEN_GITHUB,
 });
 
-nunjucks.configure('.', { autoescape: true });
+nunjucks.configure(__dirname, { autoescape: true });
 
 const mailgun = Mailgun({
 	apiKey: process.env.MAILGUN_API_KEY,
@@ -125,7 +126,7 @@ function sendEmail(data, toEmail) {
 		encoding: 'utf-8',
 	});
 	if (process.env.MOCK == 'true') {
-		fs.writeFileSync('data/email.html', email, { encoding: 'utf-8' });
+		fs.writeFileSync(path.resolve(__dirname, '../data/email.html'), email, { encoding: 'utf-8' });
 		console.log('saved to data/email.html');
 	} else {
 		mail.build(function (mailBuildError, message) {
