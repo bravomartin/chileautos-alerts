@@ -14,7 +14,7 @@
 		"@octokit/rest": "^17.6.0",
 		"dotenv": "^4.0.0",
 		"js-yaml": "^3.13.1",
-		"jsdom": "^16.2.2",
+		"jsdom": "^16.5.0",
 		"lodash": "^4.17.20",
 		"mailcomposer": "^4.0.2",
 		"mailgun-js": "^0.22.0",
