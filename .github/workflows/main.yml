@@ -3,8 +3,8 @@
 name: Run Search
 
 on:
-    schedule:
-        - cron: '10 8 * * *'
+    # schedule:
+    #    - cron: '10 8 * * *'
     push:
         branches:
             - master
